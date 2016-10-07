@@ -1,0 +1,45 @@
+%{
+    /*  definition of mainifest constants*/
+    LT,LE,EQ,NE,GT,GE,IF,THEN,ELSE,ID,NUMBER,RELOP,yylval;  
+
+%}
+
+/*regular definition*/
+
+delim  [ \t\n]
+ws     {delim}+
+letter [A-Za-z]
+digit  [0-9]
+id     {letter}({letter}|{digit})*
+number {digit}+(\.{digit}+)?(E[+-]?{digit}+)?
+
+%%
+
+{ws}        {/* no action and no return*/}
+if          {return(IF);}
+then        {return(THEN);}
+else        {return(ELSE);}
+{id}        {yylval = (int) installID();printf("sssss\n");return(ID);}
+{number}    {yylval = (int) installNum();printf("saaaaa\\n");return(NUMBER);}
+"<"         {yylval = LT ;return(RELOP);}
+"<="        {yylval = LE ;return(RELOP);}
+"="         {yylval = EQ ;return(RELOP);}
+"<>"        {yylval = NE ;return(RELOP);}
+">"         {yylval = GT ;return(RELOP);}
+">="        {yylval = GE ;return(RELOP);}
+
+%%
+
+int installID(){ /*some things*/ }
+
+int installNum(){/*some thing else*/}
+
+int yywrap(){ return 1; }
+
+
+int main(){
+    
+    yylex();
+    
+
+}
