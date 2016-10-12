@@ -129,14 +129,14 @@ int lexyy(int argc, char **argv){
 int lex_ansylse(){
     
     int status = 1;
-
+    int index = 0;
     char ch;
     read_buf();
     //std::cout << sys_buf1->sys_buffer << std::endl;
-    if(status == 1){
+    if(status == 1){     /*anasyle  the  def status*/
         char start = 0;
-        int index  = 0;
-        char word[10];
+        //int index  = 0;
+        char word[30];
         int i = 0;
         while(1){
             
@@ -146,10 +146,10 @@ int lex_ansylse(){
             }
             if(start == '}'){
                 status = 2;
+                index++;
                 break;
             }
             start = sys_buf1->sys_buffer[index];
-            //std::cout << start << "," ;
             if(start == '%' || start == '{' || start == ' '){
                 index++;
                 continue;
@@ -173,26 +173,177 @@ int lex_ansylse(){
     }
     
     if(status == 2){
+        char start   = 0;
+        int forward = 0;
+        //int index   = 0;
+        int flag    = 0;
+        int i       = 0;
+        char word_buffer[100] ;
+        
+        while(1){
+              
+            start = sys_buf1->sys_buffer[index];
             
+            
+            if(index >= buf_length){
+                read_buf();
+                index = 0;
+            }
+            if(start == '%'){
+                
+                //std::cout << word_buffer << std::endl;
+                status = 3;
+                break;
+            }
+            
+            /*存储方式？？*/
+            forward = sys_buf1->sys_buffer[index + 1];
+            if(start == ' ' ){
+                index++;
+                continue;
+            }else{
+                
+                word_buffer[i] = start;
+                i++;
+                index++;
+                if(forward == ' ' || forward == '%'){
+                    std::cout << word_buffer << std::endl;
+                    memset(word_buffer,0,sizeof(word_buffer));
+                    i  = 0;   
+                }
+                continue;
+            }
+            
+        }
+
 
 
     }
     
     if(status == 3){
-
+        
+	    char start   = 0;
+        char forward = 0;
+        int flag    = 0;
+        int i       = 0;
+        char word_buffer[100] ;
+        index += 2;
+        //std::cout << "start number " << index <<std::endl;
+        while(1){
             
+            start = sys_buf1->sys_buffer[index];
+            //std::cout << start << ":" << index << std::endl;
+            if(index >= buf_length){
+                read_buf();
+                index = 0;
+            }
+            if(start == '%'){
+                status = 4;
+                break;
+            }
+            forward = sys_buf1->sys_buffer[index + 1];
+            
+            if(start == ' '){
+                index++;
+                continue;
+            }else{
+                if(start == '{'){
+                    while(1){
+                        word_buffer[i] =  start;
+                        index++;
+                        start = sys_buf1->sys_buffer[index];
+                        i++;
+                        if(start == '}'){
+                            word_buffer[i] = start;
+                            std::cout << word_buffer << std::endl;
+                            bzero(word_buffer,100);
+                            i = 0;
+                            break;
+                        }
+                        
+                    }
+                }else if(start == '"'){
+                    while(1){  
+                        word_buffer[i] = start;
+                        index++;
+                        start = sys_buf1->sys_buffer[index];
+                        i++;
+                        if(start == '"'){
+                            word_buffer[i] = start;
+                            std::cout << word_buffer << std::endl;
+                            bzero(word_buffer,100);
+                            i  = 0;
+                            break;
+                        }
+                    }
+                }else if(is_letter(start)){
+		            while(1){  
+                        word_buffer[i] = start;
+                        index++;
+                        start = sys_buf1->sys_buffer[index];
+                        forward = sys_buf1->sys_buffer[index + 1 ];
+                        i++;
+                        if(forward == ' '){
+                            word_buffer[i] = start;
+                            std::cout << word_buffer << std::endl;
+                            bzero(word_buffer,100);
+                            i  = 0;
+                            break;
+                        }
+                    }
+		        }
+                index++;
+                continue;
+            }
+            
+            
+
+        }
+
+    if(status == 4){
+        while(1){
+            
+
+        }
+
 
     }
 
 
 
 }
+}
     
 
+int is_letter(char c){
+      
+    if((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||(c == '_')){
+        return 1;   
+    }
+    return 0;
+
+}
 
 
+int is_digit(char c){
+    
+    if((c >= '0') && (c <= '9')){
+        return 1;
+    }
+    return 0;
+
+}
 
 
+int is_sysntx(char c){
+    
+    if((c == '{') || ( c == '}') || ( c == '(') || ( c == ')' ) || (c == '[') || (c == ']') ){
+        return 1;
+    }
+    
+    return 0;
+
+}
 
 
 

@@ -32,8 +32,8 @@ else     {return (ELSE);}
 
 %%
 
-int install(){  }
+int installID(){  }
 
-int install(){  }
+int installNum(){  }
 
 

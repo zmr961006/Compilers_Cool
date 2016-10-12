@@ -18,5 +18,10 @@ int RE_to_tree();
 int lexyy(int argc,char **argv);
 int lex_ansylse();
 
+int is_letter(char c);
+int is_digit(char c);
+int is_sysntx(char c);
+
+
 
 #endif
