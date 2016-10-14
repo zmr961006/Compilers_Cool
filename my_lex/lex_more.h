@@ -21,7 +21,7 @@ int lex_ansylse();
 int is_letter(char c);
 int is_digit(char c);
 int is_sysntx(char c);
-
+int is_RE(char c);
 
 
 #endif

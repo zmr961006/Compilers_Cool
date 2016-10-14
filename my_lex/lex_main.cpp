@@ -8,8 +8,8 @@
 #include<iostream>
 #include<stdio.h>
 #include<fstream>
-#include"./my_lex.h"
-#include"./yy_more.h"
+#include"./lex_file.h"
+#include"./lex_more.h"
 
 using namespace std;
 

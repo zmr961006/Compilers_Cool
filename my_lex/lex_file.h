@@ -20,10 +20,18 @@
 
 #define RE_LIMIT        (1 << 8)
 
-#define DEF      1    /*宏定阶段*/
-#define REEX     2    /*正则阶段*/
-#define FUN      3    /*函数阶段*/
+#define LEX_TABLE       5
 
+#define DEF      1    /*宏定义阶段*/
+#define REEX     2    /*正则阶段*/
+#define WORD     3    /*关键字阶段*/
+#define FUN      4    /*用户自定义函数*/
+
+
+#define RWORD    5    /*关键字类型token*/
+#define RREEX     6    /*正则表达式token*/
+#define SYSTNX   7    /*字符类型token*/
+#define FUNC      8    /*自定义函数token*/
 
 typedef struct sys_buf{    /*buf of lex*/
 
@@ -32,7 +40,7 @@ typedef struct sys_buf{    /*buf of lex*/
 
 }sys_buf;
 
-//char *RE;   /*Regular Expression*/
+
 
 class tree_node{    /*tree_node for RE_tree*/
 
@@ -50,7 +58,17 @@ public:
 
 };
 
+typedef struct  lex_word{   /*词法字符表结构，用于构造word字符表*/
+    
+    /*此处使用哈希表的效果更佳，此处暂时不优化*/
+    int Token        ;      /*词的类型*/
+    char key_word[30];      /*词的内容*/
+    char *val_word   ;      /*词的解释*/
+    char *action     ;      /*关键字相关操作*/
+    struct lex_word *next;  /*链表*/
+    struct lex_word *last;
 
+}lex_word;
 
 
 int open_file(std::string file_name);

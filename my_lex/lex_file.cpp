@@ -8,7 +8,7 @@
 #include<iostream>
 #include<stdio.h>
 #include<fstream>
-#include"./my_lex.h"
+#include"./lex_file.h"
 using namespace std;
 
 ifstream input_file;

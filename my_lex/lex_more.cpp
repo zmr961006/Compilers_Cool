@@ -7,8 +7,9 @@
 
 #include<iostream>
 #include<stack>
-#include"./my_lex.h"
-#include"./yy_more.h"
+#include"./lex_file.h"
+#include"./lex_more.h"
+#include"./lex_table.h"
 using namespace std;
 
 /*两个缓冲区1 */
@@ -120,7 +121,8 @@ int lexyy(int argc, char **argv){
     
     open_file(filename);
     open_wfile(filename2);
-
+    
+    init_word_table();
     lex_ansylse();
 
 
@@ -132,10 +134,9 @@ int lex_ansylse(){
     int index = 0;
     char ch;
     read_buf();
-    //std::cout << sys_buf1->sys_buffer << std::endl;
+    
     if(status == 1){     /*anasyle  the  def status*/
         char start = 0;
-        //int index  = 0;
         char word[30];
         int i = 0;
         while(1){
@@ -160,7 +161,7 @@ int lex_ansylse(){
                 index++;
                 continue;
             }else if(start == ','){
-                std::cout << word  <<std::endl;
+                insert_def_word(word,30);
                 bzero(word,10);
                 index++;
                 i = 0;
@@ -173,13 +174,13 @@ int lex_ansylse(){
     }
     
     if(status == 2){
+        
         char start   = 0;
         int forward = 0;
-        //int index   = 0;
         int flag    = 0;
         int i       = 0;
         char word_buffer[100] ;
-        
+        int order = 0;    
         while(1){
               
             start = sys_buf1->sys_buffer[index];
@@ -190,15 +191,14 @@ int lex_ansylse(){
                 index = 0;
             }
             if(start == '%'){
-                
-                //std::cout << word_buffer << std::endl;
+        
                 status = 3;
                 break;
             }
             
-            /*存储方式？？*/
+            char fforward = sys_buf1->sys_buffer[index + 2];
             forward = sys_buf1->sys_buffer[index + 1];
-            if(start == ' ' ){
+            if(start == ' ' || start == '\n'){
                 index++;
                 continue;
             }else{
@@ -206,10 +206,12 @@ int lex_ansylse(){
                 word_buffer[i] = start;
                 i++;
                 index++;
-                if(forward == ' ' || forward == '%'){
-                    std::cout << word_buffer << std::endl;
+                if(forward == ' ' || forward == '%' || forward == ';' ){
+                    insert_RE(word_buffer,100,(order%2));
                     memset(word_buffer,0,sizeof(word_buffer));
-                    i  = 0;   
+                    i  = 0;
+                    order++;
+                    index++;
                 }
                 continue;
             }
@@ -221,18 +223,18 @@ int lex_ansylse(){
     }
     
     if(status == 3){
-        
+        test_RE();
 	    char start   = 0;
         char forward = 0;
         int flag    = 0;
         int i       = 0;
         char word_buffer[100] ;
         index += 2;
-        //std::cout << "start number " << index <<std::endl;
+        
         while(1){
             
             start = sys_buf1->sys_buffer[index];
-            //std::cout << start << ":" << index << std::endl;
+            
             if(index >= buf_length){
                 read_buf();
                 index = 0;
@@ -296,22 +298,39 @@ int lex_ansylse(){
                 continue;
             }
             
-            
-
+        
         }
 
     if(status == 4){
+        char buf_temp[buf_length];
+        memset(buf_temp,0,buf_length);
+        int j = 0;
+        for(int temp = index;temp <= buf_length; temp++,j++){
+            
+            buf_temp[j] = sys_buf1->sys_buffer[index];
+            index++;
+        }
+        std::cout << buf_temp << std::endl;
         while(1){
+            int flag = 0;
+            memset(buf_temp,0,buf_length);
+            flag = read_buf();
+            
+            if(flag > 0){
+                memcpy(buf_temp,sys_buf1->sys_buffer,buf_length);
+            }else{
+                break;
+            }
             
 
         }
 
-
+        
     }
 
 
+ }
 
-}
 }
     
 
@@ -345,5 +364,12 @@ int is_sysntx(char c){
 
 }
 
-
+int is_RE(char c){
+    
+    
+    if((c == '{') || ( c == '(') || (c == '[') ){
+        return 1;
+    }
+    return 0;
+}
 
