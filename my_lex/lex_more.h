@@ -8,7 +8,7 @@
 #ifndef _YY_MORE_H
 #define _YY_MORE_H
 
-int read_buf(sys_buf *buf);
+int read_buf();
 int init_buf();
 int ex_re();
 int init_RE(char *buf);
@@ -22,6 +22,11 @@ int is_letter(char c);
 int is_digit(char c);
 int is_sysntx(char c);
 int is_RE(char c);
+int is_UP(char c);
+int is_big(char c);
+int is_mid(char c);
+int is_sme(char c);
+int is_sntx(char c);
 
 
 #endif

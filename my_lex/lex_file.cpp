@@ -47,10 +47,27 @@ int open_wfile(std::string file_name){
 
 int write_infile(std::string file_name,char * buf,int length){  
     
-    write_file << buf << endl;
-    
+    //write_file.write(buf,length);
+    write_file << buf ;
     return 0;
     
+
+}
+
+int write_infile_index(std::string file_name,char *buf,int length){
+    
+    write_file.write(buf,length);
+
+}
+
+int write_infile_all(char *buf,int length){
+
+    write_file.write(buf,length);
+
+}
+int write_infile_ch(char ch){
+
+    write_file.put(ch);
 
 }
 
@@ -58,12 +75,14 @@ int write_infile(std::string file_name,char * buf,int length){
 int read_file(std::string file_name,char* buf,int length){
     
     input_file.getline(buf,length);
-
+    
+    return 0;
 }
 
 int read_all_file(std::string file_name,char *buf,int length){
 
     input_file.read(buf,length);
+    return 0;
 
 }
 

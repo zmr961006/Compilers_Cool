@@ -15,32 +15,39 @@ using namespace std;
 
 extern sys_buf *sys_buf1;
 extern sys_buf *sys_buf2; 
+
 extern char * RE;
+
+extern ifstream input_file;
+extern ofstream write_file;
+
+int chunk_pre(int argc);
+
 int main(int argc,char **argv){
     
-    //char buf[100];
-    //char *thing = "hello world\n   kasda*&^&*^&$& ()sksksk";
-    //char *reex = "(a|b)*abb";
-    //std::string name("1.l");
-    //init_buf();
-    //init_RE(reex);
-    //RE_to_tree();
-    //std::cout << reex << std::endl;
-    //std::cout << RE << std::endl;
+    chunk_pre(argc);
+    
     lexyy(argc,argv);
-    //std::string name2("yy.lex.c");
-    //open_file(name);
-    //open_wfile(name);
-    //write_infile(name,thing,30);
-    //read_all_file(name,buf,100);
-    //std::cout << buf << std::endl;
-    //read_buf(sys_buf1);
-    //std::cout << " >>" << sys_buf1->sys_buffer << std::endl;
 
-    //input_file.close();
-    //write_file.close();
+
+    input_file.close();
+    write_file.close();
+    
+    
     return 0;
 
+}
+
+
+int chunk_pre(int argc){
+    
+    if(argc < 2){
+        
+        std::cout << "please set the args \n" ;
+        
+        exit(0);
+
+    }
 
 
 }

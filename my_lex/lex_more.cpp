@@ -10,6 +10,7 @@
 #include"./lex_file.h"
 #include"./lex_more.h"
 #include"./lex_table.h"
+#include"./lex_sys.h"
 using namespace std;
 
 /*两个缓冲区1 */
@@ -122,9 +123,9 @@ int lexyy(int argc, char **argv){
     open_file(filename);
     open_wfile(filename2);
     
-    init_word_table();
-    lex_ansylse();
-
+    init_word_table();  /*初始化LEX表格*/
+    lex_ansylse();      /*建造WORD表格*/
+    lex_sys();          /*分析各个部分的内容*/
 
 }
 
@@ -139,6 +140,7 @@ int lex_ansylse(){
         char start = 0;
         char word[30];
         int i = 0;
+        int word_length = 0;
         while(1){
             
             if(index >= buf_length ){
@@ -147,24 +149,32 @@ int lex_ansylse(){
             }
             if(start == '}'){
                 status = 2;
+                insert_def_word(word,word_length);
+                //std::cout << word << ":" << word_length << std::endl;
                 index++;
                 break;
             }
             start = sys_buf1->sys_buffer[index];
-            if(start == '%' || start == '{' || start == ' '){
+            if(start == ' '){
                 index++;
                 continue;
             }
-            if(start != ','){
+            if(is_letter(start)){
                 word[i] = start;
                 i++;
                 index++;
+                word_length++;
                 continue;
             }else if(start == ','){
-                insert_def_word(word,30);
+                //std::cout << word << "the length" << word_length << std::endl;
+                insert_def_word(word,word_length);
                 bzero(word,10);
                 index++;
                 i = 0;
+                word_length = 0;
+                continue;
+            }else{   
+                index++;
                 continue;
             }
 
@@ -174,13 +184,14 @@ int lex_ansylse(){
     }
     
     if(status == 2){
-        
+        //test_def_word();
         char start   = 0;
         int forward = 0;
         int flag    = 0;
         int i       = 0;
         char word_buffer[100] ;
         int order = 0;    
+        //test_def_word();
         while(1){
               
             start = sys_buf1->sys_buffer[index];
@@ -207,7 +218,8 @@ int lex_ansylse(){
                 i++;
                 index++;
                 if(forward == ' ' || forward == '%' || forward == ';' ){
-                    insert_RE(word_buffer,100,(order%2));
+                    //std::cout << word_buffer << ":" << (i) << std::endl;
+                    insert_RE(word_buffer,i,(order%2));
                     memset(word_buffer,0,sizeof(word_buffer));
                     i  = 0;
                     order++;
@@ -223,7 +235,7 @@ int lex_ansylse(){
     }
     
     if(status == 3){
-        test_RE();
+        //test_RE();
 	    char start   = 0;
         char forward = 0;
         int flag    = 0;
@@ -241,6 +253,7 @@ int lex_ansylse(){
             }
             if(start == '%'){
                 status = 4;
+                index += 2;
                 break;
             }
             forward = sys_buf1->sys_buffer[index + 1];
@@ -257,22 +270,30 @@ int lex_ansylse(){
                         i++;
                         if(start == '}'){
                             word_buffer[i] = start;
-                            std::cout << word_buffer << std::endl;
+                            //std::cout << word_buffer << std::endl;
+                            insert_word_action(word_buffer,100,(flag % 2));
                             bzero(word_buffer,100);
+                            flag++;
                             i = 0;
                             break;
                         }
                         
                     }
                 }else if(start == '"'){
-                    while(1){  
-                        word_buffer[i] = start;
+                    while(1){
+                        //char forword ;
+                        //word_buffer[i] = forward;
                         index++;
                         start = sys_buf1->sys_buffer[index];
+                        word_buffer[i] = start;
+                        forward = sys_buf1->sys_buffer[index + 1];
                         i++;
-                        if(start == '"'){
+                        if(forward == '"'){
                             word_buffer[i] = start;
-                            std::cout << word_buffer << std::endl;
+                            //std::cout << word_buffer << std::endl;
+                            insert_word_action(word_buffer,100,(flag % 2));
+                            flag++;
+                            index++;
                             bzero(word_buffer,100);
                             i  = 0;
                             break;
@@ -287,7 +308,8 @@ int lex_ansylse(){
                         i++;
                         if(forward == ' '){
                             word_buffer[i] = start;
-                            std::cout << word_buffer << std::endl;
+                            insert_word_action(word_buffer,100,(flag % 2));
+                            flag++;
                             bzero(word_buffer,100);
                             i  = 0;
                             break;
@@ -302,7 +324,9 @@ int lex_ansylse(){
         }
 
     if(status == 4){
+        //test_action();
         char buf_temp[buf_length];
+        char fun_name[30];
         memset(buf_temp,0,buf_length);
         int j = 0;
         for(int temp = index;temp <= buf_length; temp++,j++){
@@ -310,7 +334,8 @@ int lex_ansylse(){
             buf_temp[j] = sys_buf1->sys_buffer[index];
             index++;
         }
-        std::cout << buf_temp << std::endl;
+        std::string name("");
+        write_infile(name,buf_temp,buf_length);
         while(1){
             int flag = 0;
             memset(buf_temp,0,buf_length);
@@ -322,12 +347,9 @@ int lex_ansylse(){
                 break;
             }
             
-
         }
-
         
     }
-
 
  }
 
@@ -371,5 +393,55 @@ int is_RE(char c){
         return 1;
     }
     return 0;
+}
+
+int is_UP(char ch){
+
+    if((ch >= 'A' && ch <= 'Z')){
+        return 1;
+    }
+
+    return 0;
+}
+
+int is_big(char ch){
+    
+    if((ch == '{') || (ch == '}')){
+
+        return 1;
+    }
+    return 0;
+
+}
+
+int is_sme(char ch){
+    
+    if((ch == '(') || (ch == ')')){
+
+        return 1;
+    }
+    return 0;
+
+}
+
+int is_mid(char ch){
+     
+    if((ch == '[') || (ch == ']')){
+        
+        return 1;
+    }
+    return 0;
+
+}
+
+int is_sntx(char ch){
+
+    if((ch == '*') || (ch == '%') || (ch == '/') || (ch == '?') || (ch == '+') || (ch == '.')){
+
+        return 1;
+
+    }
+    return 0;
+
 }
 

@@ -2,8 +2,7 @@
     
     LT,LE,EQ,NE,GT,GE,
     IF,THEN,ELSE,ID,NUMBER,RELOP,
-    INT,DOUBLE,FLOAT,LONG,CHAR,SHORT,VOID,
-    STRUCT,CONTINUE,BREAK,RETURN,SIZEOF,
+    INT,DOUBLE,FLOAT,BREAK,RETURN
 
 %}
 
@@ -13,11 +12,11 @@ ws       {delim}+;
 letter   [A-Za-z];
 digit    [0-9];
 id       {letter}({letter}|{digit})*;
-number   {digit}+(\.{digit}+)?(E[+-]?{digit}+)?;
+
 
 %%
 
-{ws}     {/*no action and no return*/}
+{ws}     {}
 if       {return (IF);}
 then     {return (THEN);}
 else     {return (ELSE);}

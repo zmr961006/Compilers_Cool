@@ -17,4 +17,8 @@ int test_def_word();
 int insert_RE(char * ,int ,int);
 
 int test_RE();
+
+int insert_word_action(char *,int ,int);
+
+int test_action();
 #endif
