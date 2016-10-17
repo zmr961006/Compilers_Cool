@@ -29,4 +29,5 @@ int do_oper(char ch,char forward);
 
 int test_tree();
 
+int find_tree(tree_node * node);
 #endif

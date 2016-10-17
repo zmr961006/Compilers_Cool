@@ -1,8 +1,0 @@
-open lex file : 1.lex
-{delim:5
-{letter:6
-{letter:6
-{digit:5
-{digit:5
-{digit:5
-{digit:5

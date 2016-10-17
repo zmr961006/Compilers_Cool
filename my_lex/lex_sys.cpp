@@ -91,6 +91,7 @@ int get_RE_tree(lex_word * temp){
     char last ;
     
     for(index = 0;index < temp->val_length ;index++){
+        
         start   = re_RE[index];
         forward = re_RE[index + 1];
         last    = re_RE[index - 1];
@@ -105,15 +106,18 @@ int get_RE_tree(lex_word * temp){
             i++;
             buf[i] = '_';
 
+        }else if((start == '+' || start == '?' || start == '*') && (index + 1 >= temp->val_length)){
+            i++;
+            buf[i] = '_';
         }
-        
+        //std::cout << start << ":" << std::endl;
         i++;
 
     }
     buf[i] = '#';
     
     
-    
+    std::cout << buf << std::endl;
     if(temp->Token == CHLIST){
         
         tree_node * root ;
@@ -212,6 +216,7 @@ int get_RE_tree(lex_word * temp){
                     name[h] = buf[index + h];
                     h++;
                 }
+                std::cout << "*" <<name << std::endl;
                 index += h;
                 tree_node * data;
                 data = (tree_node *)malloc(sizeof(tree_node));
@@ -230,11 +235,22 @@ int get_RE_tree(lex_word * temp){
                     node->node_length = 1;
                     node->left = NULL;
                     node->right = NULL;
+                    node->buf[0] = start;
                     S_opera.push(node);
                 }else{
                     
                     while(1){
                         char op;
+                        if(S_opera.empty()){
+
+                            tree_node *node = (tree_node *)malloc(sizeof(tree_node));
+                            node->buf[0] = start;
+                            node->node_length = 0;
+                            node->right = NULL;
+                            node->left  = NULL;
+                            S_opera.push(node);
+                            break;
+                        }
                         tree_node *top = S_opera.top();
                         if(is_bigger(start,top->buf[0]) < 0){  
                             tree_node * node = (tree_node *)malloc(sizeof(tree_node));
@@ -247,7 +263,8 @@ int get_RE_tree(lex_word * temp){
                         }else if(is_bigger(start,top->buf[0]) > 0){
                             
                             do_oper(start,forward);
-                            
+                            break;
+
                         }else if(is_bigger(start,top->buf[0]) == 0){
                             tree_node *top_node;
                             top_node = S_opera.top();
@@ -259,9 +276,14 @@ int get_RE_tree(lex_word * temp){
                            
                 }
                 
-            }else{      
+            }else{ /* '#' and other letter*/      
+                tree_node *node = (tree_node *)malloc(sizeof(tree_node));
+                node->buf[0] = start;
+                node->node_length = 0;
+                node->right = NULL;
+                node->left  = NULL;
+                S_data.push(node);
                 
-
             }
         }
         while(!S_opera.empty()){
@@ -274,10 +296,11 @@ int get_RE_tree(lex_word * temp){
             do_oper(node->buf[0],' ');
 
         }
-
+        //std::cout << "do" << std::endl;
         temp->root = S_data.top();
+        //std::cout << "done" << std::endl;
         S_data.pop();
-
+        test_tree();
     }
     
         
@@ -429,14 +452,21 @@ int test_tree(){
     lex_word * node;
     node = word_table[1].next;
     while(node != NULL){
-        //std::cout << "******"<< node->Token << std::endl;
+        
         if(node->Token == RREEX){
-            std::cout << "sss" << std::endl;
-            std::cout << node->val_word << std::endl;
+            find_tree(node->root);    
         }
         node = node->next;
         
     }
     
+
+}
+int find_tree(tree_node *node){
+    
+    std::cout << "left: " <<  node->left->buf << std::endl;
+    std::cout << "right: " <<  node->right->buf << std::endl;
+    std::cout << "mid: " <<  node->buf << std::endl;
+
 
 }
