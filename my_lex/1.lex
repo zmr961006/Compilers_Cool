@@ -7,9 +7,8 @@
 %}
 
 
-
 id       {letter}({letter}|{digit})*;
-
+number   {digit}+(\.{digit}+)?(E?{digit}+)?;
 
 %%
 

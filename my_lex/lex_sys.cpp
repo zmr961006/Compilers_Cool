@@ -65,11 +65,13 @@ int lex_RE(){
         
         temp = temp->next;
     }
+    //std::cout << "~~~~~~~~" << std::endl;
     //test_list();
 }
 
 stack<tree_node*> S_data ;
 stack<tree_node*> S_opera;
+stack<tree_node*> S_temp;
 
 int get_RE_tree(lex_word * temp){
 
@@ -196,7 +198,7 @@ int get_RE_tree(lex_word * temp){
         char forward = 0;
         char last    = 0;
         int num = i;
-        std::cout << "hello   world" << std::endl;
+        //std::cout << "hello   world" << std::endl;
         //std::cout << buf << std::endl;
         for(int index = 0;index <= num ;index++){
             start = buf[index];
@@ -216,7 +218,7 @@ int get_RE_tree(lex_word * temp){
                     name[h] = buf[index + h];
                     h++;
                 }
-                std::cout << "*" <<name << std::endl;
+                //std::cout << "*" <<name << std::endl;
                 index += h;
                 tree_node * data;
                 data = (tree_node *)malloc(sizeof(tree_node));
@@ -225,7 +227,7 @@ int get_RE_tree(lex_word * temp){
                 data->left = NULL;
                 data->right = NULL;
                 S_data.push(data);  
-
+                std::cout << "push " << data->buf << std::endl;
             }else if(start == '_' || start == '?' || start == '*' || start == '+' || start == ')' || start == '(' 
                     ||  start == '|' || start == '\\'){
          
@@ -237,10 +239,12 @@ int get_RE_tree(lex_word * temp){
                     node->right = NULL;
                     node->buf[0] = start;
                     S_opera.push(node);
+                    std::cout << "push " << node->buf << std::endl;
                 }else{
                     
                     while(1){
                         char op;
+                        std::cout << "HHHHHHHHHHHHHHH" << std::endl;
                         if(S_opera.empty()){
 
                             tree_node *node = (tree_node *)malloc(sizeof(tree_node));
@@ -248,7 +252,9 @@ int get_RE_tree(lex_word * temp){
                             node->node_length = 0;
                             node->right = NULL;
                             node->left  = NULL;
+                    
                             S_opera.push(node);
+                            std::cout << "push " << node->buf << std::endl;
                             break;
                         }
                         tree_node *top = S_opera.top();
@@ -259,6 +265,7 @@ int get_RE_tree(lex_word * temp){
                             node->left = NULL;
                             node->right = NULL;
                             S_opera.push(node);
+                            std::cout << "push " << node->buf << std::endl;
                             break;
                         }else if(is_bigger(start,top->buf[0]) > 0){
                             
@@ -269,21 +276,39 @@ int get_RE_tree(lex_word * temp){
                             tree_node *top_node;
                             top_node = S_opera.top();
                             S_opera.pop();
-                            do_oper(top_node->buf[0],start);
+                            std::cout << "pop " << top_node->buf << std::endl ;
+                            if(is_onepart(start,top_node->buf[0])){  
+                                do_oper(top_node->buf[0],start);
+                            }else{
+                                S_opera.push(top_node);
+                                do_oper(start,top_node->buf[0]);
+                                break;
+                            }
+                            
                         }
+                        /*if(start == '\\'){
+                            std::cout << "next" << start << std::endl;
+                            index++;
+                        }*/
                         
+                    }
+                    if(start == '\\'){
+                        std::cout << "next" << start << std::endl;
+                        index+=1;
                     }
                            
                 }
                 
             }else{ /* '#' and other letter*/      
+                
                 tree_node *node = (tree_node *)malloc(sizeof(tree_node));
                 node->buf[0] = start;
                 node->node_length = 0;
                 node->right = NULL;
                 node->left  = NULL;
+                //std::cout << node->buf << std::endl;
                 S_data.push(node);
-                
+                  std::cout << "push " << node->buf << std::endl;
             }
         }
         while(!S_opera.empty()){
@@ -292,14 +317,15 @@ int get_RE_tree(lex_word * temp){
             node = (tree_node *)malloc(sizeof(tree_node));
             node = S_opera.top();
             S_opera.pop();
-            
+            std::cout << "pop " << node->buf << std::endl;
             do_oper(node->buf[0],' ');
 
         }
-        //std::cout << "do" << std::endl;
+        
         temp->root = S_data.top();
-        //std::cout << "done" << std::endl;
+        
         S_data.pop();
+        std::cout << "pop " << temp->root->buf << std::endl;
         test_tree();
     }
     
@@ -316,7 +342,7 @@ int test_list(){
         while(temp != NULL){
             i = temp->node_length;
             for(int j = 0;j < i;j++){       
-                std::cout << temp->buf[j]<< std::endl;
+                //std::cout << temp->buf[j]<< std::endl;
             }
             temp = temp->right;
         }
@@ -344,7 +370,7 @@ int get_level(char ch){
     if((ch == '(') || (ch == ')') || (ch == '[') || (ch == ']')){
         return 4;
     }
-    if((ch == '*') || (ch == '+') || (ch == '_') || (ch == '?')){
+    if((ch == '*') || (ch == '+')  || (ch == '?') || (ch == '_')){
         return 3;
     }
     if((ch == '^') || (ch == '$')){
@@ -363,18 +389,22 @@ int do_oper(char ch,char forward){
         tree_node *obj;
         obj = S_data.top();
         S_data.pop();
+        std::cout << "pop " << obj->buf << std::endl;
         node->node_length = 1;
         node->buf[0] = '+';
         node->left   = obj;
+        node->right  = NULL;
         S_data.push(node);
-
+        std::cout << "push " << node->buf << std::endl;
     }else if(ch == '_'){
         tree_node *left  = NULL;
         tree_node *right = NULL;
         left = S_data.top();
         S_data.pop();
+        std::cout << "left : pop " << left->buf << std::endl;
         if(!S_data.empty()){  
             right = S_data.top();
+            std::cout << "right :pop " << right->buf << std::endl;
             S_data.pop();
         }
         tree_node * node = (tree_node *)malloc(sizeof(tree_node));
@@ -383,12 +413,17 @@ int do_oper(char ch,char forward){
         node->left = left;
         node->right = right;
         S_data.push(node);
+        std::cout << "push " << node->buf << std::endl;
     }else if(ch == '\\'){
+
         tree_node *node;
         node = (tree_node *)malloc(sizeof(tree_node));
         node->node_length = 1;
         node->buf[0] = forward;
+        node->left = NULL;
+        node->right = NULL;
         S_data.push(node);
+        std::cout << "push " << node->buf << std::endl;
 
     }else if(ch == '*'){
         tree_node *node;
@@ -396,31 +431,42 @@ int do_oper(char ch,char forward){
         tree_node *left;
         left = S_data.top();
         S_data.pop();
+        std::cout << "pop " << left->buf << std::endl;
         node->buf[0] = '*';
         node->node_length = 1;
         node->left = left;
         node->right = NULL;
-        S_data.push(left);
-
+        S_data.push(node);
+        std::cout << "push " << node->buf << std::endl;
     }else if(ch == '('){
         tree_node *node;
         node = (tree_node *)malloc(sizeof(tree_node));
         node->node_length = 0;
         node->buf[0] = '(';
+        node->right = NULL;
+        node->left  = NULL;
         S_opera.push(node);
+        std::cout << "push " << node->buf << std::endl;
     }else if(ch == ')'){
         while(1){
             tree_node * node;
             node = S_opera.top();
             S_opera.pop();
+            std::cout << " pop from s_opera " << node->buf << std::endl;
             if(node->buf[0] == '('){
                 break;
             }
-            
-            do_oper(node->buf[0],0);
-            
+            S_temp.push(node);
+            std::cout << "push to S_temp " << node->buf << std::endl;
+            //do_oper(node->buf[0],0);
         }    
-            
+        while(!S_temp.empty()){
+            tree_node *node ;
+            node = S_temp.top();
+            S_temp.pop();
+            std::cout << "pop from s_temp " << node->buf << std::endl;
+            do_oper(node->buf[0],' ');
+        }    
             
     }else if(ch == '|'){
         
@@ -430,18 +476,29 @@ int do_oper(char ch,char forward){
         node = (tree_node *)malloc(sizeof(tree_node));
         left = S_data.top();
         S_data.pop();
-        if(S_data.empty()){
+        std::cout << "pop " << left->buf << std::endl;
+        if(!S_data.empty()){
             right = S_data.top();
             S_data.pop();
+            std::cout << "pop " << right->buf << std::endl;
         }
         node->buf[0] = '|';
         node->node_length = 1;
         node->right = right;
         node->left  = left;
         S_data.push(node);
-    
-    }else{
-    
+        std::cout << "push " << node->buf << std::endl;
+    }else if(ch == '?'){
+        tree_node *node;
+        node = (tree_node *)malloc(sizeof(tree_node));
+        tree_node *left;
+        left = S_data.top();
+        S_data.pop();
+        node->buf[0] = '?';
+        node->node_length = 1;
+        node->left = left;
+        node->right = NULL;
+        S_data.push(node);
 
     }
 
@@ -464,9 +521,34 @@ int test_tree(){
 }
 int find_tree(tree_node *node){
     
-    std::cout << "left: " <<  node->left->buf << std::endl;
+    /*std::cout << "left: " <<  node->left->buf << std::endl;
     std::cout << "right: " <<  node->right->buf << std::endl;
     std::cout << "mid: " <<  node->buf << std::endl;
+    */
+
+    if(node){
+        std::cout << "$" <<node->buf << std::endl;
+        find_tree(node->left);
+        find_tree(node->right);
+    }
 
 
 }
+
+
+
+int is_onepart(char ch,char ch2){
+    
+    if(ch == ch2){
+        return 1;
+    }
+    if((ch2 == '*') || (ch2 == '?') || (ch2 == '+') ){
+        return 1;
+    }
+    if( (ch == '*') || (ch == '?') || (ch == '+') ){
+        return 0;
+    }
+
+}
+
+

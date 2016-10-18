@@ -30,4 +30,6 @@ int do_oper(char ch,char forward);
 int test_tree();
 
 int find_tree(tree_node * node);
+
+int is_onepart(char ch,char ch2);
 #endif
