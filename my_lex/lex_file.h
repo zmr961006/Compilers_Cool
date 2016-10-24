@@ -34,6 +34,11 @@
 #define FUNC      8    /*自定义函数token*/
 #define CHLIST    9    /*字符列表变量*/
 
+#define FIRSTPOS   11   /*首符集*/
+#define LASTPOS    22   /*尾符集*/
+#define FELLOWPOS  33   /*跟随集*/
+
+
 typedef struct sys_buf{    /*buf of lex*/
 
     char sys_buffer[buf_length];
@@ -48,11 +53,33 @@ typedef struct tree_node{    /*tree_node for RE_tree*/
 
     tree_node *left ;
     tree_node *right;
+    
     int        token;
     char     buf[30];
     int      node_length;
+    int      number;
+    int      operato ;
 
+    struct set * firstpos;
+    int first_num;
+    struct set * lastpos ;
+    int last_num;
+    struct set * fellowpos;
+    int fellow_num;
+    int nullable;
+    
 }tree_node;
+
+
+typedef struct set{          /*first last fellow 集合*/
+
+    char buf[10];
+    int Token   ;
+    struct set * next;
+    tree_node  * node;
+
+}set;
+
 
 typedef struct  lex_word{   /*词法字符表结构，用于构造word字符表*/
     

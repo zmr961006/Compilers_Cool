@@ -32,4 +32,30 @@ int test_tree();
 int find_tree(tree_node * node);
 
 int is_onepart(char ch,char ch2);
+
+int first_pos(tree_node * node);
+
+int get_pos(tree_node * node);
+
+int get_firstpos(tree_node *node,int type);
+
+int get_lastpos(tree_node *node,int type);
+
+int is_nullable(tree_node *node);
+
+int insert_set(tree_node *node,set * num,int type);
+
+int set_copy(tree_node *node,set * num,int type);
+
+int test_pos(set * pos);
+
+int get_fellow(tree_node *node,int type);
+
+int is_opera(tree_node *node);
+
+int get_and_test_fellow(tree_node *node);
+
+int find_fellow(tree_node * node); 
+
+int test_fellowpos(tree_node *node);
 #endif

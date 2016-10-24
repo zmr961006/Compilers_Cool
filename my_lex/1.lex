@@ -2,11 +2,12 @@
     
     LT,LE,EQ,NE,GT,GE,
     IF,THEN,ELSE,ID,NUMBER,RELOP,
-    INT,DOUBLE,FLOAT,BREAK,RETURN
+    INT,DOUBLE,FLOAT,BREAK,RETURN,
+    LK.LLK.RK,RRK,FEN,DOU,KEYWORD
 
 %}
 
-
+DOL      ({a}|{b})*{a}{b}{b};
 id       {letter}({letter}|{digit})*;
 number   {digit}+(\.{digit}+)?(E?{digit}+)?;
 
@@ -16,6 +17,9 @@ number   {digit}+(\.{digit}+)?(E?{digit}+)?;
 if       {return (IF);}
 then     {return (THEN);}
 else     {return (ELSE);}
+int      {yylval = INT;return (INT);}
+double   {yylval = DOUBLE;return (DOUBLE);}
+float    {yylval = FLOAT;return (DOUBLE);}
 {id}     {yylval = (int) installID();return (ID);}
 {number} {yylval = (int) installNum();return (NUMBER);}
 "<"      {yylval = LT;return (RELOP);}
@@ -24,7 +28,12 @@ else     {return (ELSE);}
 "<>"     {yylval = NE;return (RELOP);}
 ">"      {yylval = GT;return (RELOP);}
 ">="     {yylval = GE;return (RELOP);}
-
+"("      {yylval = LK;return (RELOP);}
+")"      {yylval = RK;return (RELOP);}
+"{"      {yylval = LLK;return (RELOP);}
+"}"      {yylval = RRK;return (RELOP);}
+";"      {yylval = FEN;return (RELOP);}
+","      {yylval = DOU;return (RELOP);}
 %%
 
 int installID(){  }
